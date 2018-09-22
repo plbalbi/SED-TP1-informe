@@ -1,14 +1,74 @@
-\documentclass{article}
+\documentclass[a4paper]{article}
+\usepackage[width=15.5cm, left=3cm, top=2.5cm, right=2cm, left=2cm, height= 24.5cm]{geometry}
+\usepackage{comment}
 \usepackage[utf8]{inputenc}
+\usepackage[spanish]{babel}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{enumitem}
+\usepackage{hyperref}
+\usepackage[table]{xcolor}
+\usepackage{caratulaMetNum}
+\usepackage{verbatim}
+\usepackage[draft]{todonotes}
+\usepackage{multicol}
+% \usepackage[firstpage=true]{background}
+\usepackage{xr}
+\usepackage{csvsimple}
+\usepackage{xpatch}
+\usepackage{booktabs}
+\usepackage{soul}
+\usepackage{bytefield}
+\usepackage{listings}
+\usepackage{caption}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage[draft]{todonotes}
+\usepackage{subcaption}
 
-\title{SED-TP1}
-\author{pablo.l.balbi }
-\date{September 2018}
+\hypersetup{
+	colorlinks = true,
+    urlcolor = blue,
+    linkcolor = red,
+    citecolor = red
+}
+
+\usepackage{array} % Nuevo tipo de columna al que le podés especificar ancho
+\newcolumntype{C}[1]{>{\centering\let\newline\\\arraybackslash}m{#1}}
+
+\newcommand{\standardroman}[1]{\romannumeral\value{#1}}
+\makeatletter
+\xpatchcmd{\csv@breakline@kernel}{\roman}{\standardroman}{}{}
+\xpatchcmd{\csv@current@col}{\roman}{\standardroman}{}{}
+\xpatchcmd{\set@csv@autohead}{\roman}{\standardroman}{}{}
+\xpatchcmd{\set@csv@head}{\roman}{\standardroman}{}{}
+\xpatchcmd{\set@csv@nohead}{\roman}{\standardroman}{}{}
+\makeatother	
+
+\setlength{\parskip}{3mm}
+
+%Magia para excluir los brainstorming del table of contents
+\usepackage[toc,page]{appendix}
+\newcommand{\stoptocwriting}{%
+  \addtocontents{toc}{\protect\setcounter{tocdepth}{-5}}}
+\newcommand{\resumetocwriting}{%
+  \addtocontents{toc}{\protect\setcounter{tocdepth}{\arabic{tocdepth}}}}
 
 \begin{document}
+	\titulo{Descripción del tp}
+	\fecha{\today}
+	\materia{Simulación de Eventos Discretos}
+	\titulo{Trabajo Práctico Número 1}
+	\subtitulo{SmartGrids}
 
-\maketitle
+	\integrante{Alfredo Umfurer}{}{}
+	\integrante{Pablo Balbi}{707/15}{pablo.l.balbi@gmail.com}
 
-\section{Introduction}
+	\maketitle
+
+	\tableofcontents
+	\pagebreak
+
+\input{secciones/intro.tex}
 
 \end{document}
