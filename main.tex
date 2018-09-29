@@ -47,7 +47,7 @@
 
 \setlength{\parskip}{3mm}
 
-%Magia para excluir los brainstorming del table of contents
+% Magia para excluir los brainstorming del table of contents
 \usepackage[toc,page]{appendix}
 \newcommand{\stoptocwriting}{%
   \addtocontents{toc}{\protect\setcounter{tocdepth}{-5}}}
@@ -69,6 +69,8 @@
 	\tableofcontents
 	\pagebreak
 
-\input{secciones/intro.tex}
+\input{secciones/introduccion.tex} \pagebreak
+\input{secciones/modelo_conceptual.tex}
+\input{secciones/especificacion_modelo.tex}
 
 \end{document}

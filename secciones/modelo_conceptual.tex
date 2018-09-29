@@ -1,0 +1,51 @@
+\section{Modelo Conceptual}
+
+Como se mencionó en la introducción, el sistema a modelar va a corresponder a
+un nodo de la red que implementa el concepto de SmartGrid. Nótese que se hace
+referencia a un nodo, sin especificar si el mismo corresponde a una vivienda,
+un edificio de departamentos, o una fábrica. Esto se debe que el modelo es lo
+suficientemente genérico, que permitiría representar a cualquiera de los
+anteriores, solo variando ciertos \textit{parámetros} del mismo. Por otro
+lado, se modelará un elemento que represente a la red eléctrica en si, con la
+que interactúa el nodo.
+
+Para que un nodo pueda participar dentro una SmartGrid, el mismo debería
+tener los siguiente sus-sistemas:
+\begin{itemize}
+    \item Algún mecanismo de generación de energía eléctrica, preferentemente
+    sustentable (no basado en combustibles fósiles, ya que en esto se basa el
+    motivante del sistema).
+    \item Una batería, en la cual almacenar la energía producida.
+    \item Un controlador, el cual tendrá la responsabilidad de interactuar con la red.
+\end{itemize}
+
+Para los generadores, se modelará dos clases de ellos: generador eólico, y
+paneles solares. Estos consistirán en dos modelos atómicos sin mucha
+complejidad. Tomarán como entrada el factor climático que los afecte, y
+tendrán como salida la cantidad de energía que están generando en ese
+instante. Esta última solo variará en caso que se produzca un cambio en el
+estado climático del sitio donde se encuentran, es decir, si reciben un
+mensaje con dicha novedad.
+
+La batería también será implementada en un modelos atómico. En este caso,
+será más compleja que los anteriores, ya que tendrá una serie de estados
+internos que cambian dependiendo si se encuentra descargada, cargando o
+siendo consumida. tendrá dos puertos de entrada, en los cuales se le
+notificará la energía que está siendo producida y la energía solicitada por
+el controlador. Por otro lado, tendrá un puerto de salida por el cual
+notificará al controlador cuando se produzca un cambio de estado en la misma.
+
+% TODO: Agregar modelo conceptual controlador
+% TODO: Agregar modelo conceptual red
+
+Una vez modelado un nodo, nos interesa ver de qué forma el mismo interactúa
+con la red, tomando como entrada datos climáticos reales, y un perfil de
+carga acorde con el de un hogar promedio\footnote{Estos detalles serán
+explicados en la sección de experimentación.}. Simulando el comportamiento
+del mismo a lo largo de un mes, en diferentes estaciones del año, se podrá
+observar patrones de generación y compra de energía a la red. 
+
+También, si fuera así, podría llegar a detectarse posibles mejoras al
+mecanismo mediante el cual el controlador opta por qué fuente de energía
+utilizar, o detectar cuellos de botella en la capacidad tanto de los
+generadores como de la batería.
