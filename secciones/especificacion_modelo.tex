@@ -2,8 +2,18 @@
 
 \subsection{Modelos Atómicos}
 
-\subsubsection{Panel Solar}
-\subsubsection{Generador Eólico}
+\subsubsection{Panel solar y generador eólico}
+Como fue descripto en el modelo conceptual (\cite{section:modeloConceptual}),
+el modelo que representa al panel solar, y también al generador eólico son
+simples. Ambos tendrán un puerto de entrada, el cual recibirá el valor de la
+magnitud de clima que los afecta, siendo radiación en el caso del primero, y
+la velocidad del viento para el segundo. Por otro lado, tendrán un puerto de
+salida, por el cual notificarán a los modelos que tengan una conexión al
+mismo, cual es la nueva cantidad de energía que están produciendo.
+
+% TODO: Poner algo haciendo referencia a que DEVS puede manejar eventos (cambios en dichas magnitudes climáticas) a distintas frecuencias de ocurrencia. Leer en el Wainer como se explicaba esto.
+% TODO: Poner las funciones de transición, y las funciones matemáticas con las cuales se calculará la potencia producida.
+
 \subsubsection{Batería}
 \subsubsection{Controlador}
 \subsubsection{Carga}
