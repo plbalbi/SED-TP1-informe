@@ -1,9 +1,12 @@
+% Document-wide defines
+\newcommand{\Reals}{{\rm I\!R}}
+
 \section{Especificación Formal}
 
 \subsection{Modelos Atómicos}
 
 \subsubsection{Panel solar y generador eólico}
-Como fue descripto en el modelo conceptual (\cite{section:modeloConceptual}),
+Como fue descripto en el modelo conceptual (\ref{section:modeloConceptual}),
 el modelo que representa al panel solar, y también al generador eólico son
 simples. Ambos tendrán un puerto de entrada, el cual recibirá el valor de la
 magnitud de clima que los afecta, siendo radiación en el caso del primero, y
@@ -13,6 +16,35 @@ mismo, cual es la nueva cantidad de energía que están produciendo.
 
 % TODO: Poner algo haciendo referencia a que DEVS puede manejar eventos (cambios en dichas magnitudes climáticas) a distintas frecuencias de ocurrencia. Leer en el Wainer como se explicaba esto.
 % TODO: Poner las funciones de transición, y las funciones matemáticas con las cuales se calculará la potencia producida.
+
+$Generador = <X,Y,S,\delta_{int}, \delta_{ext}, \lambda, ta>$
+
+Definiendo cada elemento de la tupla DEVS como:
+
+\begin{align*}
+X &= \Reals_{\geq0} & Y &= \Reals_{\geq0} & S &= energiaProducida \in \Reals_{\geq 0} \\
+\end{align*}
+
+\begin{algorithm}
+    \caption{$\delta_{int} (s)$}
+    \begin{algorithmic}
+    \STATE passivate()
+    \end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}
+    \caption{$\delta_{ext} (s,e,x)$}
+    \begin{algorithmic}
+    \STATE $energiaProducida \leftarrow calcularPotenciaProducida(x.value) $
+    \end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}
+    \caption{$\lambda (s)$}
+    \begin{algorithmic}
+    \STATE sendOutput(time, out, energiaProducida)
+    \end{algorithmic}
+\end{algorithm}
 
 \subsubsection{Batería}
 \subsubsection{Controlador}
