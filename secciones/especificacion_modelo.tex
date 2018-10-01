@@ -1,6 +1,32 @@
 % Document-wide defines
 \newcommand{\Reals}{{\rm I\!R}}
 
+% DEVS model definition helpers
+\newcommand{\deltaInt}[1]{
+    \begin{algorithm}
+        \caption{$\delta_{int} (s)$}
+        \begin{algorithmic}
+        #1
+        \end{algorithmic}
+    \end{algorithm}
+}
+\newcommand{\deltaExt}[1]{
+    \begin{algorithm}
+        \caption{$\delta_{ext} (s,e,x)$}
+        \begin{algorithmic}
+        #1
+        \end{algorithmic}
+    \end{algorithm}
+}
+\newcommand{\lambdaOut}[1]{
+    \begin{algorithm}
+        \caption{$\lambda (s)$}
+        \begin{algorithmic}
+        #1
+        \end{algorithmic}
+    \end{algorithm}
+}
+
 \section{Especificación Formal}
 
 \subsection{Modelos Atómicos}
@@ -25,26 +51,17 @@ Definiendo cada elemento de la tupla DEVS como:
 X &= \Reals_{\geq0} & Y &= \Reals_{\geq0} & S &= energiaProducida \in \Reals_{\geq 0} \\
 \end{align*}
 
-\begin{algorithm}
-    \caption{$\delta_{int} (s)$}
-    \begin{algorithmic}
+\deltaInt{
     \STATE passivate()
-    \end{algorithmic}
-\end{algorithm}
+}
 
-\begin{algorithm}
-    \caption{$\delta_{ext} (s,e,x)$}
-    \begin{algorithmic}
+\deltaExt{
     \STATE $energiaProducida \leftarrow calcularPotenciaProducida(x.value) $
-    \end{algorithmic}
-\end{algorithm}
+}
 
-\begin{algorithm}
-    \caption{$\lambda (s)$}
-    \begin{algorithmic}
+\lambdaOut{
     \STATE sendOutput(time, out, energiaProducida)
-    \end{algorithmic}
-\end{algorithm}
+}
 
 \subsubsection{Batería}
 \subsubsection{Controlador}
