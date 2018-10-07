@@ -64,6 +64,71 @@ X &= \Reals_{\geq0} & Y &= \Reals_{\geq0} & S &= energiaProducida \in \Reals_{\g
 }
 
 \subsubsection{Batería}
+El modelo de la bater\'ia consta de tres puertos de entrada y dos de salida.\\
+Tiene un puerto en el cual recibe los cambios en la cantidad de energ\'ia generada
+por el generador eólico y otro en el cual recibe la generada por el panel solar.
+En el tercer puerto recibe la cantidad de energía solicitada por el controlador.
+El puerto de salida informa un evento de la Batería, que puede ser \emph{Vacía},
+\emph{Disponible} y \emph{Completa}.
+\begin{itemize}
+    \item \emph{Vacía}: Este evento ocurre cuando la carga de la batería llega a 0. 
+    A partir de este momento, la batería no envía más energía al controlador, hasta
+    que la carga alcance el mínimo.
+    \item \emph{Disponibe}: Este evento se produce cuando la batería, una vez
+    descargada, vuelve a alcanzar el nivel mínimo de carga. A partir de este
+    momento, el controlador puede volver a solicitar carga a la batería.
+    \item \emph{Completa}: Ocurre cuando la carga alcanza la máxima capacidad.
+\end{itemize}
+
+El estado actual de la batería se determina por la cantidad de energía enviada
+por los generadores, la solicitada por el controlador, el nível de carga actual
+de la batería y la ultima vez que se actualizó el nivel de la bateria.
+$$S = \mathbb{R}_{\geq 0} \times \mathbb{R}_{\geq 0} \times \mathbb{R}_{\geq 0} \times \{x \in \mathbb{R} | 0 \leq x \leq maxima\_carga \} \times \mathbb{R}_{\geq 0}$$
+Este último valor se usa para evitar tener que actualizar el nivel de carga
+de manera continual en intervalos pequeños de tiempo: El nivel real de la carga de
+la batería en un momento de tiempo $t$ es igual a \\
+$$CargaReal = Carga+(UltimaActualizacion - t)\times(EnergiaProducida - EnergiaConsumiendose)$$
+
+Esta misma formula se puede reescribir para calcular el próximo evento a suceder,
+y resulta ser:
+$$ta = \frac{CargaEnEvento - Carga}{EnergiaProducida - EnergiaConsumiendose}$$
+
+\deltaExt{
+    \STATE {charge $\leftarrow$ calculate\_current\_charge(s, e)}
+    \IF {x.port = SOLAR\_PANEL}
+        \STATE S' $\leftarrow$ $<$x.value, S.eolic\_energy, S.sending\_energy, charge, e$>$
+    \ELSIF{x.port = EOLIC\_TURBINE}
+        \STATE S' $\leftarrow$ $<$S.solar\_energy, x.value, S.sending\_energy, charge, e$>$
+    \ELSIF{x.port = REQUIRED\_ENERGY}
+        \IF {isAvailable(S)}
+            \STATE sending\_energy $\leftarrow$ x.value
+        \ELSE
+            \STATE sending\_energy $\leftarrow$ 0
+        \ENDIF
+        \STATE S' $\leftarrow$ $<$S.solar\_energy, S.eolic\_energy, sending\_energy, charge, e$>$
+    \ENDIF
+    \STATE next\_change $\leftarrow$ calculate\_next\_event(S')
+    \RETURN {S'}
+}
+
+
+Durante las transiciones externas, o bien la energía producida o la energia consumida
+cambian de valor, así que primero se actualizan el valor actual de la carga (como se mensiona antes),
+y despues actualizamos los valores de la energía consumiendose/producientdo, salvo en el caso de 
+de la energía solicitada, cuando la batería no esté disponible, en cuyo caso, se seguirá manteniendo en 0.
+Finalimente calculamos cual va a ser el próximo evento que va a ocurrír en función de la
+carga actual y de la diferencia entre la energía producida y la consumida.
+
+Las transiciones internas ocurren durante los eventos mensionados anteriormente. En ellas,
+volvemos a actualizar el valor de la carga y calculamos cuando va a suceder el proximo evento 
+
+
+
+
+Las transiciones externas se producen cuando se envían valores a través de los puertos
+de entrada. 
+
+
 \subsubsection{Controlador}
 \subsubsection{Carga}
 \subsubsection{Red Eléctrica}

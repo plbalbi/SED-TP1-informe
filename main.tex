@@ -57,6 +57,9 @@
 \newcommand{\resumetocwriting}{%
   \addtocontents{toc}{\protect\setcounter{tocdepth}{\arabic{tocdepth}}}}
 
+\DeclareCaptionFormat{myformat}{#3}
+\captionsetup[algorithm]{format=myformat}
+
 \begin{document}
 	\titulo{Descripción del tp}
 	\fecha{\today}
@@ -64,7 +67,7 @@
 	\titulo{Trabajo Práctico Número 1}
 	\subtitulo{SmartGrids}
 
-	\integrante{Alfredo Umfurer}{}{}
+	\integrante{Alfredo Umfurer}{528/12}{alfredoumfurer@gmail.com}
 	\integrante{Pablo Balbi}{707/15}{pablo.l.balbi@gmail.com}
 
 	\maketitle
