@@ -70,79 +70,91 @@ Tiene un puerto en el cual recibe los cambios en la cantidad de energ\'ia genera
 por el generador eólico y otro en el cual recibe la generada por el panel solar.
 En el tercer puerto recibe la cantidad de energía solicitada por el controlador.
 
-Los puertos de salida son el del estado de la batería, que informa un evento, 
-que puede ser \emph{Vacía}, \emph{Disponible} y \emph{Completa}.
+Los puertos de salida son el del estado de la batería, que informa el estado actual
+de la batería, que puede ser:
 
 \begin{itemize}
-    \item \emph{Vacía}: Este evento ocurre cuando la carga de la batería llega a 0. 
-    A partir de este momento, la batería no envía más energía al controlador, hasta
-    que la carga alcance el mínimo.
-    \item \emph{Disponibe}: Este evento se produce cuando la batería, una vez
-    descargada, vuelve a alcanzar el nivel mínimo de carga. A partir de este
-    momento, el controlador puede volver a solicitar carga a la batería.
-    \item \emph{Completa}: Ocurre cuando la carga alcanza la máxima capacidad.
+    \item \emph{Vacía}: En este estado, la carga es 0, y se mantiene en él, hasta
+        que llegue energía por alguno de los generadores.
+    \item \emph{Cargando}: Posee carga, pero se encuentra por debajo del límite
+        mínimo para enviar. En este estado, la batería no hace disponible la carga.
+    \item \emph{Disponibe}: En este estado, la batería ya se encuentra disponible
+        para enviar carga, pero aún no esta llena.
+    \item \emph{Completa}: Ocurre cuando la carga alcanza la máxima capacidad. En este
+        estado, la batería informa al controlador la cantidad de energía que se está
+        produciendo en exceso, para que pueda entregarla a la red.
 \end{itemize}
 
-El otro puerto es por donde envía el sobrante de energía. El sobrante es la
-diferencia entre lo producido y lo solicitado, cuando la batería se encuentra
-llena. 
+Hay que aclarar que la batería no pasa del estado \emph{Disponibe} al \emph{Cargando}
+cuando se consume la carga y esta alcanza niveles por debajo del limite de envío, sino que
+la batería continúa enviando hasta que pasa al estado \emph{Vacía}.
 
-El estado actual de la batería se determina por la cantidad de energía enviada
-por los generadores, la solicitada por el controlador, el nível de carga actual
-de la batería y la ultima vez que se actualizó el nivel de la bateria.
+Así, el conjunto de variables que conforman de estado de la batería, es el siguiente:
 
-$$S = \mathbb{R}_{\geq 0} \times \mathbb{R}_{\geq 0} \times \mathbb{R}_{\geq 0} \times \{x \in \mathbb{R} | 0 \leq x \leq maxima\_carga \} \times \mathbb{R}_{\geq 0}$$
+\begin{itemize}
+    \item \textbf{solarPanelPower:} Cantidad de energía enviada desde el panel solar.  Real mayor o igual a 0.
+    \item \textbf{windTurbinePower:} Cantidad de energía enviada desde la turbina eolica.  Real mayor o igual a 0.
+    \item \textbf{controllerDemand:} Cantidad de energía solicitada por el controlador. Real mayor o igual a 0.
+    \item \textbf{charge:} Energía acumulada en la batería. Real mayor o igual a 0
+    \item \textbf{lastChargeUpdate:} Tiempo en que se realizó la ultima actualización del estado de la carga.
+    Variable de tipo VTime, mayor a 0
+    \item \textbf{state:} Estado actual de la batería. Uno de los cuatro valores mensionados anteriormente.
+\end{itemize}
 
-Este último valor se usa para evitar tener que actualizar el nivel de carga
-de manera continual en intervalos pequeños de tiempo: El nivel real de la carga de
-la batería en un momento de tiempo $t$ es igual a \\
-$$CargaReal = Carga+(UltimaActualizacion - t)\times(EnergiaProducida - EnergiaConsumiendose)$$
+Formalmente, $S \in \mathbb{R}_{\geq 0}^4 \times VTime_{\geq 0} \times \{Vacia, Cargando, Disponibe, Completa\}$ 
 
-Esta misma formula se puede reescribir para calcular el próximo evento a suceder,
-y resulta ser:
-$$ta = \frac{CargaEnEvento - Carga}{EnergiaProducida - EnergiaConsumiendose}$$
+Para calcular el valor real de la carga que posee la batería en el tiempo actual $t$, 
+tenemos que combinar todas estas variables de estado:
+
+$$CargaReal = charge+(lastChargeUpdate - t) \times \Delta_{energia}$$
+
+Donde $\Delta_{energia}$ es igual a la diferencia de la energía producida por los generadores y la enviada
+por la batería.
+
+Con cada cambio de alguna de estas variables, actualizamos el valor de \textbf{charge} para así
+mantener la ecuación descripta anteriormente.
+
+Esta misma formula se puede reescribir para calcular cuando sucederá el próximo cambio de la variable $state$:
+
+$$ta = \frac{CargaEnProximoEstado - charge}{\Delta_{energia}}$$
+
+En cuanto a las transiciones externas, en ellas tenemos que recalcular \textbf{charge} y el momento en que se
+producirá el proximo cambio de estado.
 
 \deltaExt{
     \STATE {charge $\leftarrow$ calculate\_current\_charge(s, e)}
     \IF {x.port = SOLAR\_PANEL}
-        \STATE S' $\leftarrow$ $<$x.value, S.eolic\_energy, S.sending\_energy, charge, e$>$
+        \STATE S' $\leftarrow$ $<$x.value, S.windTurbinePower, S.controllerDemand, charge, e, s.state$>$
     \ELSIF{x.port = EOLIC\_TURBINE}
-        \STATE S' $\leftarrow$ $<$S.solar\_energy, x.value, S.sending\_energy, charge, e$>$
+        \STATE S' $\leftarrow$ $<$S.solarPanelPower, x.value, S.controllerDemand, charge, e, s.state$>$
     \ELSIF{x.port = REQUIRED\_ENERGY}
-        \IF {isAvailable(S)}
-            \STATE sending\_energy $\leftarrow$ x.value
-        \ELSE
-            \STATE sending\_energy $\leftarrow$ 0
-        \ENDIF
-        \STATE S' $\leftarrow$ $<$S.solar\_energy, S.eolic\_energy, sending\_energy, charge, e$>$
+        \STATE S' $\leftarrow$ $<$S.solarPanelPower, S.windTurbinePower, x.value, charge, e, s.state$>$
     \ENDIF
     \STATE next\_change $\leftarrow$ calculate\_next\_event(S')
     \RETURN {S'}
 }
 
+Las transiciones internas, se corresponden a cambios en del estado.
+
 \lambdaOut{
-    \IF {S.charge = 0}
-        \STATE sendOutput(time, battery\_state, EMPTY)
-    \ELSIF {S.charge = MIN\_CAPACITY}
-        \STATE sendOutput(time, battery\_state, AVAILABE)
-    \ELSIF {S.charge = BATTERY\_CAPACITY}
-        \STATE sendOutput(time, battery\_state, FULL)
-        \STATE sendOutput(time, surplus\_energy, S.energiaProducida - S.energiaConsumiendose)
+    \STATE {charge $\leftarrow$ calculate\_current\_charge(s, current\_time)}
+    \STATE {(S', next\_change) $\leftarrow$ calculate\_next\_state(s, charge, current\_time)}
+    \RETURN {S'}
+}
+
+\lambdaOut{
+    \STATE {charge $\leftarrow$ calculate\_current\_charge(s, current\_time)}
+    \STATE {(S', next\_change) $\leftarrow$ calculate\_next\_state(s, charge, current\_time)}
+    \STATE {sendOutput(time, battery\_state\_port, S'.state)}
+    \IF {S'.state = \emph{Completa}}
+        \STATE {sendOutput(time, out, $\Delta_{energy}$(S'))}
     \ENDIF
 }
 
-Durante las transiciones externas, o bien la energía producida o la energia consumida
-cambian de valor, así que primero se actualizan el valor actual de la carga (como se mensiona antes),
-y despues actualizamos los valores de la energía consumiendose/producientdo, salvo en el caso de 
-de la energía solicitada, cuando la batería no esté disponible, en cuyo caso, se seguirá manteniendo en 0.
-Finalimente calculamos cual va a ser el próximo evento que va a ocurrír en función de la
-carga actual y de la diferencia entre la energía producida y la consumida.
-
-Las transiciones internas ocurren durante los eventos mensionados anteriormente. En ellas,
-volvemos a actualizar el valor de la carga y calculamos cuando va a suceder el proximo evento 
-
-Las transiciones externas se producen cuando se envían valores a través de los puertos
-de entrada. 
+Hay que mensionar que, si bien no se refleja en el pseudocódigo, también usamos las
+transiciones internas para poder informar cambios en la cantidad de energía sobrante cuando
+la batería se encuentra llena, ya que si bien no cambia el valor de la variable \textbf{state},
+no podemos hacer uso de la función de output desde transiciones externas.
 
 \subsubsection{Controlador}
 
@@ -158,7 +170,7 @@ energía que hace a la red y el otro a la batería.
 En cuanto al estado interno del controlador, el mismo debe almacenar los siguientes valores:
 
 \begin{itemize}
-    \item \textbf{batteryState:} Almacena el estado actual de la bateria que tiene conectada,
+    \item \textbf{batteryState:} Almacena el estado actual de la batería que tiene conectada,
     es necesario para determinar si podemos pedirle energía a la misma o no.
     \item \textbf{currentLoadDemand:} Cantidad de energía solicitada por la carga.
     \item \textbf{batteryDemand:} Cantidad de energía solicitada/vendida a la batería.
@@ -168,7 +180,7 @@ En cuanto al estado interno del controlador, el mismo debe almacenar los siguien
 El modelo actual tiene el siguiente comportamiento: Si la batería esta disponible, le solicitará
 toda la carga necesaria para cubrir las necesidades de la carga, siempre que esta no supere
 el umbral definido, en cuyo caso le pedirá el máximo posible y lo demás lo pedirá de la red.
-Si la bateria está descargada, esta dejará de suministrarle energía hasta que no se encuentre
+Si la batería está descargada, esta dejará de suministrarle energía hasta que no se encuentre
 disponible nuevamente.
 
 En el caso de que la batería le informe que tiene un excedente de producción, el controlador
