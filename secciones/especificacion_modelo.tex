@@ -1,3 +1,5 @@
+% !TeX root = ../main.tex
+
 % Document-wide defines
 \newcommand{\Reals}{{\rm I\!R}}
 
@@ -64,9 +66,9 @@ X &= \Reals_{\geq0} & Y &= \Reals_{\geq0} & S &= energiaProducida \in \Reals_{\g
 }
 
 \subsubsection{Batería}
-El modelo de la bater\'ia consta de tres puertos de entrada y dos de salida.
+El modelo de la batería consta de tres puertos de entrada y dos de salida.
 
-Tiene un puerto en el cual recibe los cambios en la cantidad de energ\'ia generada
+Tiene un puerto en el cual recibe los cambios en la cantidad de energía generada
 por el generador eólico y otro en el cual recibe la generada por el panel solar.
 En el tercer puerto recibe la cantidad de energía solicitada por el controlador.
 
@@ -151,7 +153,7 @@ Las transiciones internas, se corresponden a cambios en del estado.
     \ENDIF
 }
 
-Hay que mensionar que, si bien no se refleja en el pseudocódigo, también usamos las
+Hay que mencionar que, si bien no se refleja en el pseudocódigo, también usamos las
 transiciones internas para poder informar cambios en la cantidad de energía sobrante cuando
 la batería se encuentra llena, ya que si bien no cambia el valor de la variable \textbf{state},
 no podemos hacer uso de la función de output desde transiciones externas.
@@ -175,9 +177,10 @@ En cuanto al estado interno del controlador, el mismo debe almacenar los siguien
     \item \textbf{currentLoadDemand:} Cantidad de energía solicitada por la carga.
     \item \textbf{batteryDemand:} Cantidad de energía solicitada/vendida a la batería.
     \item \textbf{gridDemand:} Cantidad de energía solicitada a la red.
+    \item \textbf{extraEnergy:} Cantidad de energía excedente siendo generada. 
 \end{itemize}
 
-El modelo actual tiene el siguiente comportamiento: Si la batería esta disponible, le solicitará
+El modelo actual tiene el siguiente comportamiento: Si la batería está disponible, le solicitará
 toda la carga necesaria para cubrir las necesidades de la carga, siempre que esta no supere
 el umbral definido, en cuyo caso le pedirá el máximo posible y lo demás lo pedirá de la red.
 Si la batería está descargada, esta dejará de suministrarle energía hasta que no se encuentre
