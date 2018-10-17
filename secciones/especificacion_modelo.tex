@@ -160,13 +160,15 @@ no podemos hacer uso de la función de output desde transiciones externas.
 
 \subsubsection{Controlador}
 
-El modelo del controlador consta de cinco puertos, tres de entrada y tres de salida.
+El modelo del controlador consta de seis puertos, tres de entrada y tres de salida.
 
 Uno de los puertos de entrada es donde recibe las solicitudes de la carga, otro
 es donde recibe el estado actual de la batería y el tercero es por donde la batería 
 le avisa la cantidad de energía sobrante.
 
-En cuanto a los puertos de salida, corresponden a los pedidos de energía a la red, los pedidos a la batería, y por último, la energía \textbf{vendida} a la red.
+En cuanto a los puertos de salida, uno de ellos se corresponde a los pedidos de 
+energía que hace a la red, otro a los que hace a la batería y el tercero a la cantidad de 
+energía que se vende a la red.
 
 En cuanto al estado interno del controlador, el mismo debe almacenar los siguientes valores:
 
@@ -174,70 +176,96 @@ En cuanto al estado interno del controlador, el mismo debe almacenar los siguien
     \item \textbf{batteryState:} Almacena el estado actual de la batería que tiene conectada,
     es necesario para determinar si podemos pedirle energía a la misma o no.
     \item \textbf{currentLoadDemand:} Cantidad de energía solicitada por la carga.
-    \item \textbf{batteryDemand:} Cantidad de energía solicitada/vendida a la batería.
+    \item \textbf{batteryDemand:} Cantidad de energía solicitada a la batería.
     \item \textbf{gridDemand:} Cantidad de energía solicitada a la red.
-    \item \textbf{extraEnergy:} Cantidad de energía excedente siendo generada. 
+    \item \textbf{extraEnergy:} Cantidad de energía sobrante, informada por la batería.
+    \item \textbf{state:} Puede ser \emph{AllGrid} o \emph{GridAndBattery}. En el primer
+        caso, toda la energía se está pidiendo a la red, mientras que en el segundo, se
+        le pide a la batería, y todo aquello que esté por encima de la máxima potencia
+        de salida de la batería, se lo pide a la red.
 \end{itemize}
 
-Como el comportamiento del controlador se encuentra fuertemente relacionado con el de la batería, este se separó en dos estados posibles:
-\begin{itemize}
-    \item \textbf{AllGrid}: La totalidad de la energía solicitada es suplida por la red.
-    \item \textbf{GridAndBattery}: Como la batería puede suplir energía, la carga solicitada es repartida entre esta y la red.
-\end{itemize}
+También forman parte del estado las variables \textbf{notifyBattery} y \textbf{notifyExtraEnergy}
+cuyo objetivo es poder simular el envío de mensajes en transiciones externas a través del envío
+en transiciones internas agendadas a tiempo 0, luego que las externas.
 
-De esta manera, dependiendo el estado en el que se encuentre, cambiará la forma en la que se distribuirá la demanda de energía. Esto puede verse en como se encuentra definida la función de transición externa, que actualiza estos valores. 
+El modelo actual tiene el siguiente comportamiento: Si la batería esta disponible, le solicitará
+toda la carga necesaria para cubrir las necesidades de la carga, siempre que esta no supere
+el umbral definido, en cuyo caso le pedirá el máximo posible y lo demás lo pedirá de la red.
+Si la batería está descargada, esta dejará de suministrarle energía hasta que no se encuentre
+disponible nuevamente.
 
-Como en esta caso las transiciones de estados suceden como respuesta a un evento externo, la función $\Delta_{int}$ no realiza otra función que \textbf{pasivar} al modelo, dejándolo a la espera del siguiente evento.
-
-\begin{figure}
-    \centering\includegraphics[width=0.7\textwidth]{secciones/figs/estadosContolador.pdf}
-    \caption{Máquina de estados finita que describe la transición de estados en el controlador.}
-\end{figure}
-
-
-\deltaInt{
-    \STATE passivate()
-}
+En el caso de que la batería le informe que tiene un excedente de producción, el controlador
+lo enviará a la red.
 
 % TODO: Update all function below
 \deltaExt{
-    \IF {x.port = batteryStatePort}
-        \STATE S' $\leftarrow$ $<$ x.value, currentLoadDemand, batteryDemand, gridDemand $>$
-        \STATE S'' $\leftarrow$ updateGridConsuption(S')
+    \STATE S' $\rightarrow$ S
+    \IF {x.port = batterySurplusEnergy}
+        \STATE S'.notifyExtraEnergy $\rightarrow$ \textbf{true}
+        \STATE S'.extraEnergy $\leftarrow$ x.value
+        \RETURN S'
+    \ELSIF {x.port = batteryStatePort}
+        \STATE S'.batteryState $\leftarrow$ x.value
+        \STATE S' $\leftarrow$ updateControllerState(S')
     \ELSIF {x.port = loadDemand}
-        \STATE S' $\leftarrow$ $<$ batteryState, x.value, currentLoadDemand, batteryDemand, gridDemand $>$
-        \STATE S'' $\leftarrow$ updateGridConsuption(S')
-    \ELSIF {x.port = batterySurplusEnergy}
-        \STATE S'' $\leftarrow$ $<$ batteryState, currentLoadDemand, LoadDemand, batteryDemand, -x.value $>$
+        \STATE S'.loadDemand $\leftarrow$ x.value
     \ENDIF
+    \STATE S' $\leftarrow$ UpdateGridConsuption(S')
     \STATE nextChange = 0
     \RETURN S''
 }
 
 \begin{algorithm}
-    \caption{$UpdateGridConsuption(S)$}
+    \caption{$updateControllerState(S)$}
     \begin{algorithmic}[H]
-        \IF {S.batteryState == AVAILABE or S.batteryState == FULL}
-            \IF {S.currentLoadDemand $<$ MAX\_CHARGE}
-                \RETURN $<$batteryState, currentLoadDemand, currentLoadDemand, 0$>$
-            \ELSE
-                \RETURN $<$batteryState, currentLoadDemand, MAX\_CHARGE, currentLoadDemand-MAX\_CHARGE$>$
-            \ENDIF
+        \STATE S' $\leftarrow$ S
+        \IF {S.batteryState = AVAILABE and S.state = AllGrid}
+            \STATE S'.state $\leftarrow$ GridAndBattery
+        \ELSIF {S.batteryState = EMPTY and S.state = GridAndBattery}
+            \STATE S'.state $\leftarrow$ AllGrid
+            \STATE S'.notifyBattery $\leftarrow$ \textbf{true}
+        \ENDIF
+        \RETURN S'
+    \end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}
+    \caption{$updateGridConsuption(S)$}
+    \begin{algorithmic}[H]
+        \STATE S' $\leftarrow$ S
+        \IF {S.state == AllGrid}
+            \STATE S'.batteryDemand $\leftarrow$ 0
+            \STATE S'.gridDemand $\leftarrow$ S'.loadDemand
         \ELSE
-            \RETURN $<$batteryState, currentLoadDemand, 0, currentLoadDemand$>$
+            \STATE S'.batteryDemand $\leftarrow$ min(S'.loadDemand, MAXIMUM\_POWER)
+            \STATE S'.gridDemand $\leftarrow$ S'.loadDemand - S'.batteryDemand
         \ENDIF
     \end{algorithmic}
 \end{algorithm}
 
-\lambdaOut{
-    \STATE sendOutput(time, gridDemandPort, S.gridDemand)
-    \STATE sendOutput(time, batteryDemandPort, S.batteryDemand)
+\deltaInt{
+    \STATE S' = S
+    \STATE S'.notifyExtraEnergy $\leftarrow$ \textbf{false}
+    \STATE passivate()
+    \RETURN S'
 }
 
-\subsubsection{Carga}
-\subsubsection{Red Eléctrica}
+\lambdaOut{
+    \IF {s.notifyBattery}
+        \STATE sendOutput(time, sellingEnergy, S.extraEnergy)
+    \ELSE
+        \STATE sendOutput(time, gridDemandPort, S.gridDemand)
+        \IF {s.state = GridAndBattery \textbf{or} s.notifyBattery}
+            \STATE sendOutput(time, gridDemandPort, S.gridDemand)
+        \ENDIF
+        \IF {s.state = AllGrid}
+            \STATE s.notifyBattery $\leftarrow$ \textbf{false}
+        \ENDIF
+        \STATE sendOutput(time, batteryDemandPort, S.batteryDemand)
+    \ENDIF
+}
 
 \subsection{Modelos Acoplados}
 
 \subsubsection{Casa}
-\subsubsection{Top Model}
