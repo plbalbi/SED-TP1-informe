@@ -160,14 +160,13 @@ no podemos hacer uso de la función de output desde transiciones externas.
 
 \subsubsection{Controlador}
 
-El modelo del controlador consta de cinco puertos, tres de entrada y dos de salida.
+El modelo del controlador consta de cinco puertos, tres de entrada y tres de salida.
 
 Uno de los puertos de entrada es donde recibe las solicitudes de la carga, otro
 es donde recibe el estado actual de la batería y el tercero es por donde la batería 
 le avisa la cantidad de energía sobrante.
 
-En cuanto a los puertos de salida, uno de ellos se corresponde a los pedidos (o venta) de 
-energía que hace a la red y el otro a la batería.
+En cuanto a los puertos de salida, corresponden a los pedidos de energía a la red, los pedidos a la batería, y por último, la energía \textbf{vendida} a la red.
 
 En cuanto al estado interno del controlador, el mismo debe almacenar los siguientes valores:
 
@@ -180,19 +179,27 @@ En cuanto al estado interno del controlador, el mismo debe almacenar los siguien
     \item \textbf{extraEnergy:} Cantidad de energía excedente siendo generada. 
 \end{itemize}
 
-El modelo actual tiene el siguiente comportamiento: Si la batería está disponible, le solicitará
-toda la carga necesaria para cubrir las necesidades de la carga, siempre que esta no supere
-el umbral definido, en cuyo caso le pedirá el máximo posible y lo demás lo pedirá de la red.
-Si la batería está descargada, esta dejará de suministrarle energía hasta que no se encuentre
-disponible nuevamente.
+Como el comportamiento del controlador se encuentra fuertemente relacionado con el de la batería, este se separó en dos estados posibles:
+\begin{itemize}
+    \item \textbf{AllGrid}: La totalidad de la energía solicitada es suplida por la red.
+    \item \textbf{GridAndBattery}: Como la batería puede suplir energía, la carga solicitada es repartida entre esta y la red.
+\end{itemize}
 
-En el caso de que la batería le informe que tiene un excedente de producción, el controlador
-lo enviará a la red. Esto se representa con un valor negativo.
+De esta manera, dependiendo el estado en el que se encuentre, cambiará la forma en la que se distribuirá la demanda de energía. Esto puede verse en como se encuentra definida la función de transición externa, que actualiza estos valores. 
+
+Como en esta caso las transiciones de estados suceden como respuesta a un evento externo, la función $\Delta_{int}$ no realiza otra función que \textbf{pasivar} al modelo, dejándolo a la espera del siguiente evento.
+
+\begin{figure}
+    \centering\includegraphics[width=0.7\textwidth]{secciones/figs/estadosContolador.pdf}
+    \caption{Máquina de estados finita que describe la transición de estados en el controlador.}
+\end{figure}
+
 
 \deltaInt{
     \STATE passivate()
 }
 
+% TODO: Update all function below
 \deltaExt{
     \IF {x.port = batteryStatePort}
         \STATE S' $\leftarrow$ $<$ x.value, currentLoadDemand, batteryDemand, gridDemand $>$
