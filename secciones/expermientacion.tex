@@ -1,0 +1,21 @@
+% !TeX root = ../main.tex
+
+\section{Simulación y análisis}
+
+\subsection{Eventos}
+Nuestro modelo tiene la característica de alimentarse de datos externos para simular los efectos climáticos en la generación de energía, y las variaciones en el consumo de un hogar. Es por eso, que en vez de utilizar datos producidos aleatoriamente exclusivamente para llevar a cabo este trabajo, optamos por utilizar fuentes de datos disponibles en internet, pero que corresponden a casos reales. 
+
+En primer, como fuente de datos de clima, utilizamos un dataset de Kaggle\footnote{\url{https://www.kaggle.com/runphilrun/hi-seas-solar-radiation-prediction}}, una plataforma para abierta para compartir fuentes de datos, y llevar a cabo competencias en ciencias de datos. Los mismos fueron recolectados por NASA\footnote{\url{https://hi-seas.org/}}, en dos misiones llevadas a cabo en una instalación ubicada en la base de un volcán en Hawaii, Estados Unidos. La expedición es llamada HI-SEAS
+ (\textit{Hawai’i Space Exploration Analog and Simulation}), y los datos corresponden a las misiones IV y V (septiembre a diciembre de 2016).
+
+ La fuente de datos posee diversas mediciones meteorológicas, pero de estas solo nos interesa la radiación solar, medida en $\frac{Watts}{m^2}$; y la velocidad del viento, medida en $\frac{km}{hora}$. Todas estas mediciones fueron realizadas con una frecuencia de cinco minutos.
+
+ Por otro lado, la fuente de datos utilizada para el consumo eléctrico corresponde a \textit{University of California, Irvine}\footnote{\url{https://archive.ics.uci.edu/ml/datasets/Individual+household+electric+power+consumption}}, y fueron tomadas en una casa en Francia, entre diciembre de 2006 y 2010. El dato que extrajimos de esta fuente es la potencia activa consumida, medida cada un minuto, y cuya unidad es $Watts$. Algo importante a notar, que puede ser posible gracias a la asincronía que soporta DEVS en los eventos que suceden, es que $1,25\%$ de las mediciones son nulas (debido a algún inconveniente en la lectura de las mismas), las cuales fueron omitidas, y por consiguiente, no incluidas entre los eventos disparados en la simulación.
+
+ Los eventos fueron procesados y combinados en un solo archivo de eventos. El procesamiento consistió en:
+ \begin{itemize}
+     \item Conversión de las unidades originales de las fuentes de datos a las utilizadas en el modelo.
+     \item Normalización de las fechas asignadas a cada medición, para que las mismas arranquen en 00:00:00:00 (en tiempo DEVS, el inicio de la simulación), y conversión de las mismas al formato de tiempo utilizado por el simulador, respetando la diferencia relativa entre los eventos. Para esto se tomo la fecha 00:00:00:00 como la hora 00:00 AM, del primer día simulado.
+     \item Inclusión de ambas fuentes de datos en un mismo archivo de eventos. Resultó interesante descubrir que el simulador ignora el orden en el que lee los eventos del archivo, ya que después al programarlos para ser disparados los reordena, lo cual permite armar el archivo no teniendo que ordenar los eventos manualmente.
+     
+ \end{itemize}
