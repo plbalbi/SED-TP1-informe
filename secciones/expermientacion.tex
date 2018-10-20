@@ -255,7 +255,7 @@ problemas descriptos anteriormente, pero hay instantes en los que por
 alrededor de una hora la velocidad del viento disminuyó
 significativamente, que pueden dar sentido a las observaciones.
 
-\begin{figure}
+\begin{figure}[H]
     \begin{center}
     \adjustimage{max size={0.9\linewidth}{0.9\paperheight}}{secciones/solarVsEolica_files/solarVsEolica_21_0.png}
     \end{center}
@@ -276,6 +276,7 @@ El tiempo considerado es de una semana y la energía solicitada/pedida se mide e
 \begin{figure}[H]
     \centering
     \includegraphics[scale=0.3]{images/cons.eps}
+    \caption{Comparación entre energía generada y energía vendida.}
 \end{figure}
 
 Ahora calculamos el acumulado de estos valores podemos observar como evoluciona el
@@ -283,8 +284,8 @@ balance de energía.
 
 \begin{figure}[H]
     \centering
-    % \includegraphics[scale=0.3]{images/acc.eps}
     \includegraphics[scale=0.3]{images/compWW.eps}
+    \caption{Comparación entre el consumo con y sin los generadores.}
 \end{figure}
 
 En el gráfico vemos que con estos generadores aún existe bastante dependencia de la red,
