@@ -85,7 +85,7 @@ transformación de los datos; como para graficar y obtener medidas
 estadisticas.
 
 \pagebreak
-\subsection{Desarrollo}
+\subsubsection{Organización del desarrollo}
 El desarrollo esta organizado de la manera en la que fueron sucediendo las
 simulaciones realizadas (se incluye en cada una las configuraciones pasadas
 al simulador, de forma de poder replicarlas fácilmente\footnote{Todos los
@@ -94,7 +94,7 @@ comandos son tomando como directorio base:
 con el análisis). Cada sección tiene algunas conclusiones parciales, y
 construye sobre la anterior.
 
-\subsubsection{¿Cuál medio de generación aporta más?}
+\subsection{¿Cuál medio de generación aporta más?}
 % ./bin/cd++ -e../eventGeneration/mergedData.ev -mmodels/solarAndWindControllerModel.ma -oout/solarAndWind1Week -lout/solarAndWind1Week.log -t168:00:00:00
 
     \hypertarget{suxf3lo-generaciuxf3n-solar-1-semana}{%
@@ -136,15 +136,19 @@ corresponden los con los de menor consumo, situación en la que el panes
 batería en los momentos de mayor consumo (en la que por si mismo, no
 realiza mucho aporte).
 
+\begin{figure}
     \begin{center}
     \adjustimage{max size={0.9\linewidth}{0.9\paperheight}}{secciones/solarVsEolica_files/solarVsEolica_9_0.png}
     \end{center}
-    { \hspace*{\fill} \\}
+    \caption{Desglose de la generación y el consumo del sistema, solo generando con el panel solar.}
+\end{figure}
     
+\begin{figure}
     \begin{center}
     \adjustimage{max size={0.9\linewidth}{0.9\paperheight}}{secciones/solarVsEolica_files/solarVsEolica_10_0.png}
     \end{center}
-    { \hspace*{\fill} \\}
+    \caption{Cambios en los estados de la batería, para un sistema solo generando con el panel solar.}
+\end{figure}
     
     \hypertarget{suxf3lo-generaciuxf3n-solar-y-euxf3lica-1-semana}{%
 \subsubsection{Sólo generación solar y eólica, 1
@@ -160,7 +164,7 @@ generadores.
 
 Se puede ver la gran diferencia en la carga y la generación de ambas
 simulaciones. El aporte de la turbina eólica hace que el comportamiento
-del SmartGrid cambie radicalmente, pudiendo sumistrar la totalidad de la
+del SmartGrid cambie radicalmente, pudiendo suministrar la totalidad de la
 energía solicitada por intervalos extensos.
 
 También se puede ver como a diferencia de la batería, en los instantes
@@ -172,26 +176,29 @@ Hay momentos en los cuales la batería se encuentra llena, y permanece de
 esa manera durante un tiempo. Aquí surgen dos alternativas: - Vender la
 energía excedente que esta siendo generada, lo cual es la ida central de
 un SmartGrid. - Aumentar la capacidad de la batería, de manera de
-cargarla aún más, y autoabastecer la instalación por instantes de timpo
+cargarla aún más, y auto abastecer la instalación por instantes de tiempo
 aún mayores.
 
 De ambas formas se produce un ahorro. Se podría establecer el costo de
 cada opción, y mediante simulaciones como esta (con alguna pequeña
 diferencia en los modelos) concluir cual es la más viable.
 
+\begin{figure}
     \begin{center}
     \adjustimage{max size={0.9\linewidth}{0.9\paperheight}}{secciones/solarVsEolica_files/solarVsEolica_14_0.png}
     \end{center}
-    { \hspace*{\fill} \\}
+    \caption{Desglose de la generación y el consumo del sistema, con ambos generadores funcionando.}
+\end{figure}
     
+\begin{figure}
     \begin{center}
     \adjustimage{max size={0.9\linewidth}{0.9\paperheight}}{secciones/solarVsEolica_files/solarVsEolica_15_0.png}
     \end{center}
-    { \hspace*{\fill} \\}
+    \caption{Cambios en los estados de la batería, para un sistema con ambos generadores.}
+\end{figure}
     
-    \hypertarget{quuxe9-generador-vale-muxe1s}{%
-\subsubsection{Qué generador vale
-más?}\label{quuxe9-generador-vale-muxe1s}}
+\hypertarget{quuxe9-generador-vale-muxe1s}{%
+\subsubsection{Comparación}\label{quuxe9-generador-vale-muxe1s}}
 
     Si vemos cuánto generaron en cada instante ambos generadores de manera
 acumulada, lo primero que podemos notar es la variabilidad de los
@@ -222,10 +229,12 @@ especial, ya que físicamente poseé inercia (si su rotor está girando a
 una velocidad \(V > 0\), el que la velocidad del viento disminuya a cero
 no hará que \(V\) pase a valer cero en el acto).
 
+\begin{figure}[H]
     \begin{center}
     \adjustimage{max size={0.9\linewidth}{0.9\paperheight}}{secciones/solarVsEolica_files/solarVsEolica_18_0.png}
     \end{center}
-    { \hspace*{\fill} \\}
+    \caption{Generación acumulada de ambos generadores.}
+\end{figure}
 
     Si omitimos estas consideraciones, igual podemos notar la diferencia
 entre la potencia producida por el generador eólico y el solar. No solo
@@ -246,13 +255,14 @@ problemas descriptos anteriormente, pero hay instantes en los que por
 alrededor de una hora la velocidad del viento disminuyó
 significativamente, que pueden dar sentido a las observaciones.
 
+\begin{figure}
     \begin{center}
     \adjustimage{max size={0.9\linewidth}{0.9\paperheight}}{secciones/solarVsEolica_files/solarVsEolica_21_0.png}
     \end{center}
-    { \hspace*{\fill} \\}
+    \caption{Generación acumulada y normalizada de ambos generadores.}
+\end{figure}
 
-
-\subsection{Consumo acumulado:}
+\subsection{Consumo acumulado}
 A continuación observaremos las señales enviadas desde el controlador a la red, graficando
 como positivas las señales de pedido de energía por parte de la red, y como negativas las
 de venta de energía a la red.
