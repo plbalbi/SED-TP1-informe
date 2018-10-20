@@ -103,8 +103,12 @@ A continuación observaremos las señales enviadas desde el controlador a la red
 como positivas las señales de pedido de energía por parte de la red, y como negativas las
 de venta de energía a la red.
 
-El tiempo considerado es de una semana y la energía solicitada/pedida se mide en Watts hora.
+Para generar los datos, corrimos la siguiente simulación:
 
+{\tt ./run.sh models/BuyAndSell.ma ../eventGeneration/mergedData.ev fbs}
+
+El tiempo considerado es de una semana y la energía solicitada/pedida se mide en Watts hora.
+ 
 \begin{figure}[H]
     \centering
     \includegraphics[scale=0.3]{images/cons.eps}
@@ -115,8 +119,9 @@ balance de energía.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[scale=0.3]{images/acc.eps}
+    % \includegraphics[scale=0.3]{images/acc.eps}
+    \includegraphics[scale=0.3]{images/compWW.eps}
 \end{figure}
 
 En el gráfico vemos que con estos generadores aún existe bastante dependencia de la red,
-pero el consumo de una semana es mucho menor (175kW).
+pero el consumo de una semana es menor que la energía solicitada por las cargas.
