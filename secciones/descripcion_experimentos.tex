@@ -1,0 +1,18 @@
+\section{Experimentación:}
+
+\subsection{Elección de generadores}
+Para calcular la energía generada por la celda solar, usamos la siguiente formula:
+
+$$producedEnergy = \frac{radiation \times PeakPower \times Area}{1000}$$
+
+Donde $PeakPower$ es un factor que depende del generador.
+
+Buscamos las especificaciones de un equipo\footnote{https://www.fiasa.com.ar/DoWNloADs/FIASA-FOLLETO-GENERADOR-SOLAR.pdf}  
+y tomamos uno con $PeakPower=100$. Consideramos entonces un panel solar de 1m$^2$ y con estos valores calculamos la
+energía producida por este medio.
+
+Para la turbina eólica buscamos un modelo teórico que explique los valores generados,
+pero no lo puedimos ajustar con las especificaciones de turbinas, así que elegimos un
+modelomy utilizamos una interpolación de manera que se ajuste a los valores 
+provistos por el vendedor. \footnote{https://articulo.mercadolibre.com.ar/MLA-616433420-turbina-generador-eolico-aerogenerador-1200w-48v-enertik-\_JM}
+
