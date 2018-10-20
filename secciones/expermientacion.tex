@@ -72,3 +72,28 @@ sección tiene algunas conclusiones parciales, y construye sobre la anterior.
 
 \subsubsection{¿Cuál medio de generación aporta más?}
 % ./bin/cd++ -e../eventGeneration/mergedData.ev -mmodels/solarAndWindControllerModel.ma -oout/solarAndWind1Week -lout/solarAndWind1Week.log -t168:00:00:00
+
+
+
+\subsection{Consumo acumulado:}
+A continuación observaremos las señales enviadas desde el controlador a la red, graficando
+como positivas las señales de pedido de energía por parte de la red, y como negativas las
+de venta de energía a la red.
+
+El tiempo considerado es de una semana y la energía solicitada/pedida se mide en Watts hora.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.3]{images/cons.eps}
+\end{figure}
+
+Ahora calculamos el acumulado de estos valores podemos observar como evoluciona el
+balance de energía. 
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.3]{images/acc.eps}
+\end{figure}
+
+En el gráfico vemos que con estos generadores aún existe bastante dependencia de la red,
+pero el consumo de una semana es mucho menor (175kW).
