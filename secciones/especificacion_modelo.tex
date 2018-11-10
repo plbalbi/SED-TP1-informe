@@ -34,7 +34,7 @@
 \subsection{Modelos Atómicos}
 
 \subsubsection{Panel solar y generador eólico}
-Como fue descripto en el modelo conceptual (\ref{section:modeloConceptual}),
+Como fue descripto en el modelo conceptual \rref{section:modeloConceptual},
 el modelo que representa al panel solar, y también al generador eólico son
 simples. Ambos tendrán un puerto de entrada, el cual recibirá el valor de la
 magnitud de clima que los afecta, siendo radiación en el caso del primero, y
@@ -50,7 +50,7 @@ $Generador = <X,Y,S,\delta_{int}, \delta_{ext}, \lambda, ta>$
 Definiendo cada elemento de la tupla DEVS como:
 
 \begin{align*}
-X &= \Reals_{\geq0} & Y &= \Reals_{\geq0} & S &= energiaProducida \in \Reals_{\geq 0} \\
+X &= \Reals_{\geq0} & Y &= \Reals_{\geq0} & S &= \text{energíaProducida} \in \Reals_{\geq 0} \\
 \end{align*}
 
 \deltaInt{
@@ -58,11 +58,11 @@ X &= \Reals_{\geq0} & Y &= \Reals_{\geq0} & S &= energiaProducida \in \Reals_{\g
 }
 
 \deltaExt{
-    \STATE $energiaProducida \leftarrow calcularPotenciaProducida(x.value) $
+    \STATE $\text{energíaProducida} \leftarrow calcularPotenciaProducida(x.value) $
 }
 
 \lambdaOut{
-    \STATE sendOutput(time, out, energiaProducida)
+    \STATE sendOutput(time, out, energíaProducida)
 }
 
 \subsubsection{Batería}
@@ -95,33 +95,33 @@ Así, el conjunto de variables que conforman de estado de la batería, es el sig
 
 \begin{itemize}
     \item \textbf{solarPanelPower:} Cantidad de energía enviada desde el panel solar.  Real mayor o igual a 0.
-    \item \textbf{windTurbinePower:} Cantidad de energía enviada desde la turbina eolica.  Real mayor o igual a 0.
+    \item \textbf{windTurbinePower:} Cantidad de energía enviada desde la turbina eólica.  Real mayor o igual a 0.
     \item \textbf{controllerDemand:} Cantidad de energía solicitada por el controlador. Real mayor o igual a 0.
     \item \textbf{charge:} Energía acumulada en la batería. Real mayor o igual a 0
     \item \textbf{lastChargeUpdate:} Tiempo en que se realizó la ultima actualización del estado de la carga.
     Variable de tipo VTime, mayor a 0
-    \item \textbf{state:} Estado actual de la batería. Uno de los cuatro valores mensionados anteriormente.
+    \item \textbf{state:} Estado actual de la batería. Uno de los cuatro valores mencionados anteriormente.
 \end{itemize}
 
-Formalmente, $S \in \mathbb{R}_{\geq 0}^4 \times VTime_{\geq 0} \times \{Vacia, Cargando, Disponibe, Completa\}$ 
+Formalmente, $S = \mathbb{R}_{\geq 0}^4 \times VTime_{\geq 0} \times \{Vacia, Cargando, Disponibe, Completa\}$ 
 
 Para calcular el valor real de la carga que posee la batería en el tiempo actual $t$, 
 tenemos que combinar todas estas variables de estado:
 
-$$CargaReal = charge+(lastChargeUpdate - t) \times \Delta_{energia}$$
+$$charge_{t=t_{current}} = charge_{t=t_{lastChargeUpdate}}+(t_{current} - t_{lastChargeUpdate}) \times \Delta_{Potencia}$$
 
-Donde $\Delta_{energia}$ es igual a la diferencia de la energía producida por los generadores y la enviada
-por la batería.
+Donde $\Delta_{Potencia}$ es igual a la diferencia de la potencia producida por los generadores y la consumida
+de la batería.
 
 Con cada cambio de alguna de estas variables, actualizamos el valor de \textbf{charge} para así
 mantener la ecuación descripta anteriormente.
 
-Esta misma formula se puede reescribir para calcular cuando sucederá el próximo cambio de la variable $state$:
+Esta misma fórmula se puede reescribir para calcular cuando sucederá el próximo cambio de la variable $state$:
 
-$$ta = \frac{CargaEnProximoEstado - charge}{\Delta_{energia}}$$
+$$ta = \frac{charge_{\text{next state}} - charge_{t=t_{current}}}{\Delta_{Potencia}}$$
 
 En cuanto a las transiciones externas, en ellas tenemos que recalcular \textbf{charge} y el momento en que se
-producirá el proximo cambio de estado.
+producirá el próximo cambio de estado.
 
 \deltaExt{
     \STATE {charge $\leftarrow$ calculate\_current\_charge(s, e)}
@@ -136,9 +136,9 @@ producirá el proximo cambio de estado.
     \RETURN {S'}
 }
 
-Las transiciones internas, se corresponden a cambios en del estado.
+Las transiciones internas, se corresponden a cambios en el estado.
 
-\lambdaOut{
+\deltaInt{
     \STATE {charge $\leftarrow$ calculate\_current\_charge(s, current\_time)}
     \STATE {(S', next\_change) $\leftarrow$ calculate\_next\_state(s, charge, current\_time)}
     \RETURN {S'}

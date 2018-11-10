@@ -12,7 +12,7 @@ pero que corresponden a casos reales.
 
 En primer, como fuente de datos de clima, utilizamos un dataset de
 Kaggle\footnote{\url{https://www.kaggle.com/runphilrun/hi-seas-solar-radiation-prediction}},
-una plataforma para abierta para compartir fuentes de datos, y llevar a cabo
+una plataforma para compartir fuentes de datos, y llevar a cabo
 competencias en ciencias de datos. Los mismos fueron recolectados por
 NASA\footnote{\url{https://hi-seas.org/}}, en dos misiones llevadas a cabo en
 una instalación ubicada en la base de un volcán en Hawaii, Estados Unidos. La
@@ -67,7 +67,7 @@ energía producida por este medio.
 
 Para la turbina eólica buscamos un modelo teórico que explique los valores generados,
 pero no lo pudimos ajustar con las especificaciones de turbinas, así que elegimos un
-modelos y utilizamos una interpolación de manera que se ajuste a los valores 
+modelo y utilizamos una interpolación de manera que se ajuste a los valores 
 provistos por el vendedor. \footnote{https://articulo.mercadolibre.com.ar/MLA-616433420-turbina-generador-eolico-aerogenerador-1200w-48v-enertik-\_JM}
 
 \subsection{Ambiente de Simulación y experimentación} 
@@ -108,7 +108,7 @@ semana}\label{suxf3lo-generaciuxf3n-solar-1-semana}}
 -mmodels/justSolarControllerModel.ma -oout/justSolar1Week
 -lout/justSolar1Week.log -t168:00:00:00}
 
-    En esta primera simulación, se evalúa el comportamiento del sistema
+    En esta primera simulación\textsuperscript{\ref{fig:simu1:1}, \ref{fig:simu1:2}}, se evalúa el comportamiento del sistema
 completo, pero solo utilizando el panel solar como fuente de generación.
 
 Lo primero que es interesante notar, es como el comportamiento del panel
@@ -140,14 +140,14 @@ realiza mucho aporte).
     \begin{center}
     \adjustimage{max size={0.9\linewidth}{0.9\paperheight}}{secciones/solarVsEolica_files/solarVsEolica_9_0.png}
     \end{center}
-    \caption{Desglose de la generación y el consumo del sistema, solo generando con el panel solar.}
+    \caption{Desglose de la generación y el consumo del sistema, solo generando con el panel solar.}\label{fig:simu1:1}
 \end{figure}
     
 \begin{figure}
     \begin{center}
     \adjustimage{max size={0.9\linewidth}{0.9\paperheight}}{secciones/solarVsEolica_files/solarVsEolica_10_0.png}
     \end{center}
-    \caption{Cambios en los estados de la batería, para un sistema solo generando con el panel solar.}
+    \caption{Cambios en los estados de la batería, para un sistema solo generando con el panel solar.}\label{fig:simu1:2}
 \end{figure}
     
     \hypertarget{suxf3lo-generaciuxf3n-solar-y-euxf3lica-1-semana}{%
@@ -159,7 +159,7 @@ semana}\label{suxf3lo-generaciuxf3n-solar-y-euxf3lica-1-semana}}
 
 \texttt{./bin/cd++\ -e../eventGeneration/mergedData.ev\ -mmodels/solarAndWindControllerModel.ma\ -oout/solarAndWind1Week\ -lout/solarAndWind1Week.log\ -t168:00:00:00}
 
-    En esta segunda simulación, se evalúa el mismo sistema, pero con ambos
+    En esta segunda simulación\textsuperscript{\ref{fig:simu2:1}, \ref{fig:simu2:2}}, se evalúa el mismo sistema, pero con ambos
 generadores.
 
 Se puede ver la gran diferencia en la carga y la generación de ambas
@@ -174,7 +174,7 @@ mismo comportamiento a un mes, por ejemplo).
 
 Hay momentos en los cuales la batería se encuentra llena, y permanece de
 esa manera durante un tiempo. Aquí surgen dos alternativas: - Vender la
-energía excedente que esta siendo generada, lo cual es la ida central de
+energía excedente que esta siendo generada, lo cual es la idea central de
 un SmartGrid. - Aumentar la capacidad de la batería, de manera de
 cargarla aún más, y auto abastecer la instalación por instantes de tiempo
 aún mayores.
@@ -187,60 +187,22 @@ diferencia en los modelos) concluir cual es la más viable.
     \begin{center}
     \adjustimage{max size={0.9\linewidth}{0.9\paperheight}}{secciones/solarVsEolica_files/solarVsEolica_14_0.png}
     \end{center}
-    \caption{Desglose de la generación y el consumo del sistema, con ambos generadores funcionando.}
+    \caption{Desglose de la generación y el consumo del sistema, con ambos generadores funcionando.} \label{fig:simu2:1}
 \end{figure}
     
 \begin{figure}
     \begin{center}
     \adjustimage{max size={0.9\linewidth}{0.9\paperheight}}{secciones/solarVsEolica_files/solarVsEolica_15_0.png}
     \end{center}
-    \caption{Cambios en los estados de la batería, para un sistema con ambos generadores.}
+    \caption{Cambios en los estados de la batería, para un sistema con ambos generadores.}\label{fig:simu2:2}
 \end{figure}
     
 \hypertarget{quuxe9-generador-vale-muxe1s}{%
 \subsubsection{Comparación}\label{quuxe9-generador-vale-muxe1s}}
 
-    Si vemos cuánto generaron en cada instante ambos generadores de manera
-acumulada, lo primero que podemos notar es la variabilidad de los
-valores. Hay instantes en los que la potencia acumulada llega a los
-\(650W\), mientras que al momento siguiente llega a casi 0. A priori uno
-pensaría que esto se debe a los datos, lo cual es en parte cierto, pero
-el problema va más alla de eso. Como ambos generadores varían su
-potencia generada al recibir como evento un cambio en el estado
-meteorólogico de la simulación, de manera instantánea, esto da lugar a
-ciertas situaciones especiales, dadas por la forma en la que se
-realizaron las mediciones utilizada como eventos: - Si en algún momento
-el instrumento para medir la radiación solar fue ocluído, esto dará
-lugar a una serie de mediciones en las cuales su valor disiminuyo
-significativamente, no representando la realidad. - Cambios repentinos
-en la velocidad del viento, lo cual es normal, ya que el mismo puede
-tener un comportamiento compuesto por ráfagas. - Problemas en los
-instrumentos, lo cual dará mediciones erróneas, o valores no
-consistentes.
-
-Pero más allá de esto, esto podría solucionarse si los modelos de los
-generadores tuvieran algún tipo de inercia. Esto sería, algún tipo de
-resistencia al cambio repentino, no viendose su salida, o su estado
-interno afectado por que de un instante para el otro se recibió un
-evento qué indicaba que la velocidad del viento disminuyó a casi cero, y
-depués de este otro en el cual ya volvió al valor anterior (tomando como
-ejemplo el generador eólico). Aparte, el generador eólico es un caso
-especial, ya que físicamente poseé inercia (si su rotor está girando a
-una velocidad \(V > 0\), el que la velocidad del viento disminuya a cero
-no hará que \(V\) pase a valer cero en el acto).
-
-\begin{figure}[H]
-    \begin{center}
-    \adjustimage{max size={0.9\linewidth}{0.9\paperheight}}{secciones/solarVsEolica_files/solarVsEolica_18_0.png}
-    \end{center}
-    \caption{Generación acumulada de ambos generadores.}
-\end{figure}
-
-    Si omitimos estas consideraciones, igual podemos notar la diferencia
-entre la potencia producida por el generador eólico y el solar. No solo
-en la intensidad de la misma, sino en la constancia.
-
-Por otro lado, como la fuente de energía del generador eólico no depende
+Podemos notar \textsuperscript{\ref{fig:simu3:1},\ref{fig:simu3:2}} la diferencia entre la potencia producida por el generador
+eólico y el solar. No solo en la intensidad de la misma, sino en la
+constancia. Como la fuente de energía del generador eólico no depende
 del horario del día (al menos no de manera directa), tiene un
 comportamiento mucho mas constante, generando valores parecidos en
 cualquier instante.
@@ -249,17 +211,21 @@ Si normalizamos los valores de producción de energía en cada instante,
 podemos ver qué porcentaje de lo generado corresponde a cada uno de los
 generadores. Como era de esperar, gran parte corresponde a la turbina
 eólica, cubriendo en promedio el \(83,16\%\) de la energía producida.
-Más alla de esto, hay insttante en que casi la totalidad de la
-generación corresponde al panel solar. Esto puede deberse a los
-problemas descriptos anteriormente, pero hay instantes en los que por
-alrededor de una hora la velocidad del viento disminuyó
-significativamente, que pueden dar sentido a las observaciones.
+Más allá de esto, hay instante en que casi la totalidad de la
+generación corresponde al panel solar. 
+
+\begin{figure}[H]
+    \begin{center}
+    \adjustimage{max size={0.9\linewidth}{0.9\paperheight}}{secciones/solarVsEolica_files/solarVsEolica_18_0.png}
+    \end{center}
+    \caption{Generación acumulada de ambos generadores.}\label{fig:simu3:1}
+\end{figure}
 
 \begin{figure}[H]
     \begin{center}
     \adjustimage{max size={0.9\linewidth}{0.9\paperheight}}{secciones/solarVsEolica_files/solarVsEolica_21_0.png}
     \end{center}
-    \caption{Generación acumulada y normalizada de ambos generadores.}
+    \caption{Generación acumulada y normalizada de ambos generadores.}\label{fig:simu3:2}
 \end{figure}
 
 \subsection{Consumo acumulado}
