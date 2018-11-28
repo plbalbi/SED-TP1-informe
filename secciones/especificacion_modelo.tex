@@ -200,9 +200,9 @@ lo enviará a la red.
 
 % TODO: Update all function below
 \deltaExt{
-    \STATE S' $\rightarrow$ S
+    \STATE S' $\leftarrow$ S
     \IF {x.port = batterySurplusEnergy}
-        \STATE S'.notifyExtraEnergy $\rightarrow$ \textbf{true}
+        \STATE S'.notifyExtraEnergy $\leftarrow$ \textbf{true}
         \STATE S'.extraEnergy $\leftarrow$ x.value
         \RETURN S'
     \ELSIF {x.port = batteryStatePort}
@@ -211,8 +211,8 @@ lo enviará a la red.
     \ELSIF {x.port = loadDemand}
         \STATE S'.loadDemand $\leftarrow$ x.value
     \ENDIF
-    \STATE S' $\leftarrow$ UpdateGridConsuption(S')
-    \STATE nextChange = 0
+    \STATE S'' $\leftarrow$ UpdateGridConsuption(S')
+    \STATE nextChange $\leftarrow$ 0
     \RETURN S''
 }
 
@@ -241,6 +241,7 @@ lo enviará a la red.
             \STATE S'.batteryDemand $\leftarrow$ min(S'.loadDemand, MAXIMUM\_POWER)
             \STATE S'.gridDemand $\leftarrow$ S'.loadDemand - S'.batteryDemand
         \ENDIF
+        \RETURN S'
     \end{algorithmic}
 \end{algorithm}
 
